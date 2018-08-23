@@ -1,5 +1,5 @@
 # coding = utf-8
-import redis
+
 from flask import Flask, session
 from flask_migrate import Migrate, MigrateCommand
 from flask_session import Session
@@ -7,9 +7,11 @@ from flask_sqlalchemy import SQLAlchemy
 
 from flask_script import Manager
 from flask.ext.wtf import CSRFProtect
-from config import config
-from info import db, app
 
+from info import db, create_app
+
+
+app = create_app("development")
 manager = Manager(app)
 # 将app 与db关联
 Migrate(app, db)

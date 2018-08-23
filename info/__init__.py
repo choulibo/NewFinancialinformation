@@ -7,15 +7,21 @@ from flask_wtf import CSRFProtect
 
 from config import config
 
-app = Flask(__name__)
-# 从配置对象中加载
-app.config.from_object(config["development"])
-# 初始化数据库
-db = SQLAlchemy(app)
+db = SQLAlchemy()
 
-# 初始化redis 存储对象
-redis_store = redis.StrictRedis(host=config["development"].REDIS_HOST, port=config["development"].REDIS_PORT)
-# CSRF保护,只做服务器验证
-CSRFProtect(app)
-# 设置session保存指定位置
-Session(app)
+def create_app(config_name):
+    app = Flask(__name__)
+    # 从配置对象中加载
+    app.config.from_object(config[config_name])
+    # 初始化数据库
+    # 通过app初始化
+    db.init_app(app)
+
+    # 初始化redis 存储对象
+    redis_store = redis.StrictRedis(host=config[config_name].REDIS_HOST, port=config[config_name].REDIS_PORT)
+    # CSRF保护,只做服务器验证
+    CSRFProtect(app)
+    # 设置session保存指定位置
+    Session(app)
+
+    return app
