@@ -1,7 +1,7 @@
 # coding = utf-8
 
 
-class Config(object):
+class config(object):
     """工程配置信息"""
     DEBUG = True
     SECRET_KEY = "jDk1CX4rp/c7uo2jr2GbrMST+ZKLGtVMFHVKSaCoammRmn4NXWsE90MCLis6/LJ"
@@ -22,3 +22,28 @@ class Config(object):
     SESSION_PERMANENT = False
     # 设置过期时间
     PERMANENT_SESSION_LIFETIME = 86400 * 2
+
+
+
+class DevelopmentConfig(config):
+    """开发环境下的配置"""
+    DEBUG = True
+
+class ProductionConfig(config):
+    DEBUG = False
+
+
+class TestingConfig(config):
+    DEBUG = True
+    TESTING = True
+
+
+config = {
+    "development":DevelopmentConfig,
+    "production":ProductionConfig,
+    "testing":TestingConfig
+
+}
+
+
+
