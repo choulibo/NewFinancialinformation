@@ -8,25 +8,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask.ext.wtf import CSRFProtect
 from config import Config
+from info import db, app
 
-
-
-app = Flask(__name__)
-app.config.from_object(Config)
 manager = Manager(app)
-# 初始化数据库
-db = SQLAlchemy(app)
+# 将app 与db关联
 Migrate(app, db)
+#　将迁移命令添加到manager 中
 manager.add_command('db', MigrateCommand)
-# 从配置对象中加载
-
-
-# 初始化redis 存储对象
-redis_store = redis.StrictRedis(host=Config.REDIS_HOST, port=Config.REDIS_PORT)
-# CSRF保护,只做服务器验证
-CSRFProtect(app)
-# 设置session保存指定位置
-Session(app)
 
 
 @app.route('/')
