@@ -1,4 +1,5 @@
 # coding = utf-8
+import logging
 
 from flask import Flask, session
 from flask_migrate import Migrate, MigrateCommand
@@ -22,6 +23,11 @@ manager.add_command('db', MigrateCommand)
 @app.route('/')
 def index():
     session["name"] = "itlife"
+    logging.debug("测试debug")
+    logging.warning("测试dwarning")
+    logging.error("测试error")
+    logging.fatal("测试fatal")
+
     return 'indexnihao'
 
 
