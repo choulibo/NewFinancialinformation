@@ -9,7 +9,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_script import Manager
 from flask.ext.wtf import CSRFProtect
 
-from info import db, create_app
+from info import db, create_app,models
+
+# manage.py 是程序启动的入口，只关心启动的相关参数及内容；
+# 不关心具体创建app或者相关的逻辑
 
 
 app = create_app("development")
@@ -20,15 +23,7 @@ Migrate(app, db)
 manager.add_command('db', MigrateCommand)
 
 
-@app.route('/')
-def index():
-    session["name"] = "itlife"
-    logging.debug("测试debug")
-    logging.warning("测试dwarning")
-    logging.error("测试error")
-    logging.fatal("测试fatal")
 
-    return 'indexnihao'
 
 
 if __name__ == '__main__':
