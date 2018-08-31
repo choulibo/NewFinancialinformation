@@ -64,6 +64,7 @@ class User(BaseModel, db.Model):
 
     @password.setter
     def password(self, value):
+        # self.password_hash = 对value加密
         self.password_hash = generate_password_hash(value)
 
     def check_passowrd(self, password):
