@@ -15,6 +15,64 @@ from info.utils.response_code import RET
 from . import passport_blu
 from info.utils.captcha.captcha import captcha
 
+@passport_blu.route('/login',methods = ["POST","GET"])
+def login():
+    """
+    登录:
+    1.获取参数
+    2.校验参数
+    3.校验密码是否正确
+    4.保存用户的登录状态
+    5.响应
+    :return:
+    """
+    # 1.获取参数
+    param_dict = request.json
+    mobile = param_dict.get('mobile')
+    password = param_dict.get('password')
+
+    # 2.校验参数
+    if not all([mobile,password]):
+        return jsonify(errno=RET.PARAMERR,errmsg='参数错误')
+
+    # 3.    校验手机号是否正确
+    if not re.match('1[35678]\\d{9}',mobile):
+        return jsonify(errno=RET.PARAMERR,errmsg='手机格式不正确')
+
+    # 校验密码是否正确
+    # 先查询出当前的手机号是否是注册用户
+    # 一般从数据库中查询都要做异常抛出
+    try:
+        user = User.query.filter(User.mobile == mobile).first()
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR, errmsg='数据查询错误')
+
+    # 判断用户是否存在
+    if not user:
+        return jsonify(errno=RET.NODATA,errmsg='用户名或者密码错误')
+
+    # 校验登录的密码和当前用户的登录密码是否一致
+    if not user.check_passowrd(password):
+        return jsonify(errno=RET.PWDERR,errmsg='用户名或者密码错误')
+
+    # 4.保存用户的登录状态
+    session['user_id'] = user.id
+    session['mobile'] = user.mobile
+    session['nick_name'] = user.nick_name
+
+    # 5.响应
+    return jsonify(errno=RET.OK,errmsg='登录成功')
+
+
+
+
+
+
+
+
+
+
 
 @passport_blu.route('/register', methods=["POST"])
 def register():
@@ -138,11 +196,11 @@ def send_sms_code():
     sms_code_str = "%06d" % random.randint(0, 999999)
     current_app.logger.debug("短信验证码内容是:%s" % sms_code_str)
     # 6.发送短信验证码
-    result = CCP().send_template_sms(mobile, [sms_code_str, constants.SMS_CODE_REDIS_EXPIRES / 60], 1)
-
-    if result != 0:
-        # 不为0 ,说明发送不成功
-        return jsonify(errno=RET.THIRDERR, errmsg="发送短信失败")
+    # result = CCP().send_template_sms(mobile, [sms_code_str, constants.SMS_CODE_REDIS_EXPIRES / 60], 1)
+    #
+    # if result != 0:
+    #     # 不为0 ,说明发送不成功
+    #     return jsonify(errno=RET.THIRDERR, errmsg="发送短信失败")
 
     # 7.保存验证码到redis中
     try:
